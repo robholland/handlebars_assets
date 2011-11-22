@@ -11,14 +11,14 @@ module HandlebarsAssets
       compiled_hbs = Handlebars.precompile(data)
 
       if name.starts_with?('_')
-        partial_name = name[1..-1].inspect
+        partial_name = scope.logical_path.sub(/#{name}$/, name[1..-1]).to_s
         <<-PARTIAL
           (function() {
             Handlebars.registerPartial(#{partial_name}, Handlebars.template(#{compiled_hbs}));
           }).call(this);
         PARTIAL
       else
-        template_name = scope.logical_path.inspect
+        template_name = scope.logical_path.to_s
         <<-TEMPLATE
           function(context) {
             return HandlebarsTemplates[#{template_name}](context);
@@ -30,9 +30,9 @@ module HandlebarsAssets
     end
 
     protected
-
+    
     def basename(path)
-      path.gsub(%r{.*/}, '')
+      path.sub(%r{.*/}, '')
     end
 
     def prepare; end
